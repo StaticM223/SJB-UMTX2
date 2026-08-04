@@ -40,14 +40,24 @@ const payload_map = [
         version: "2.4b",
         toPort: 9021
     },
-	    {
-        displayTitle: "ShadowMountPlus-1.6b",
+	{
+        displayTitle: "ShadowMountPlus 1.6",
         description: "SMP",
         fileName: "shadowmountplus.elf",
-        author: "Me",
-        projectSource: "https://github.com/etaHEN/etaHEN",
+        author: "Drakmor",
+        projectSource: "https://github.com/drakmor/ShadowMountPlus",
         binarySource: "https://github.com/drakmor/ShadowMountPlus/releases/download/1.6beta16/shadowmountplus.elf",
         version: "1.6b16",
+        toPort: 9021
+    },
+		{
+        displayTitle: "BackPork 0.1",
+        description: "BP",
+        fileName: "ps5-backpork.elf",
+        author: "BestPig",
+        projectSource: "https://github.com/BestPig/BackPork/",
+        binarySource: "https://github.com/BestPig/BackPork/releases/download/0.1/ps5-backpork.elf",
+        version: "0.1",
         toPort: 9021
     },
     {
