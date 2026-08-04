@@ -1,53 +1,331 @@
-<html>
-<!-- <html manifest="cache.appcache"> -->
+<!DOCTYPE html>
+<html lang="en">
 
 <head>
-    <title>Shit Jailbreak</title>
+    <title>SJB-UMTX2 PS5</title>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="main.css">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            background:
+                radial-gradient(circle at top left, #1e3a8a, transparent 40%),
+                radial-gradient(circle at bottom right, #7c3aed, transparent 40%),
+                #020617;
+            color: white;
+            font-family: Inter, "Segoe UI", Arial, sans-serif;
+        }
+
+        /* ── Row 1: Header ── */
+        .header-row {
+            text-align: center;
+            padding: 48px 24px 24px;
+            position: relative;
+        }
+
+        .header-row h1 {
+            font-size: 2.6rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, #38bdf8, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .header-row p {
+            color: #cbd5e1;
+            font-size: 1rem;
+            margin-top: 10px;
+        }
+
+        .header-row #current-fw {
+            color: #38bdf8;
+        }
+
+        /* ── Toast ── */
+        #toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        /* ── Row 2: Main content ── */
+        #main-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 24px 40px;
+        }
+
+        /* Pre-jailbreak view: two action cards */
+        #pre-jb-view {
+            display: none;
+            flex-direction: column;
+            gap: 20px;
+            width: 100%;
+            max-width: 680px;
+        }
+
+        #pre-jb-view.selected {
+            display: flex;
+        }
+
+        /* Card style matching page 2 */
+        .action-card {
+            position: relative;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            padding: 30px 36px;
+            color: white;
+            text-decoration: none;
+            overflow: hidden;
+            cursor: pointer;
+            display: block;
+            transition:
+                transform 0.25s ease,
+                border-color 0.25s ease,
+                box-shadow 0.25s ease;
+        }
+
+        .action-card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                120deg,
+                transparent,
+                rgba(255, 255, 255, 0.12),
+                transparent
+            );
+            transform: translateX(-100%);
+            transition: transform 0.5s ease;
+        }
+
+        .action-card:hover::before {
+            transform: translateX(100%);
+        }
+
+        .action-card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(56, 189, 248, 0.7);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .action-card h2 {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+        }
+
+        .action-card p {
+            color: #cbd5e1;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 14px;
+            border-radius: 999px;
+            font-size: 0.78rem;
+            font-weight: 600;
+            background: #22c55e;
+            color: white;
+        }
+
+        .badge.jailbroken {
+            background: linear-gradient(90deg, #38bdf8, #a78bfa);
+            color: white;
+            box-shadow: 0 0 12px rgba(56, 189, 248, 0.45);
+        }
+
+        .badge.waiting {
+            background: rgba(251, 191, 36, 0.15);
+            color: #fbbf24;
+            border: 1px solid rgba(251, 191, 36, 0.35);
+        }
+
+        .badge.ready-inject {
+            background: #22c55e;
+            color: white;
+        }
+
+        .badge.secondary {
+            background: rgba(56, 189, 248, 0.2);
+            color: #38bdf8;
+            border: 1px solid rgba(56, 189, 248, 0.35);
+        }
+
+        /* ── Console view ── */
+        #console-view {
+            display: none;
+            width: 100%;
+            max-width: 760px;
+        }
+
+        #console-view.selected {
+            display: block;
+        }
+
+        #console {
+            background: rgba(2, 6, 23, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 16px;
+            padding: 20px;
+            font-family: "Fira Code", "Courier New", monospace;
+            font-size: 0.82rem;
+            line-height: 1.6;
+            color: #94a3b8;
+            min-height: 280px;
+            max-height: 50vh;
+            overflow-y: auto;
+            backdrop-filter: blur(10px);
+        }
+
+        /* ── Payloads view ── */
+        #payloads-view {
+            display: none;
+            width: 100%;
+            max-width: 760px;
+        }
+
+        #payloads-view.selected {
+            display: block;
+        }
+
+        /* ── Row 3: Footer ── */
+        .footer-row {
+            text-align: center;
+            padding: 20px 24px 32px;
+            position: relative;
+            color: #94a3b8;
+            font-size: 0.85rem;
+        }
+
+        .footer-row a {
+            color: #a78bfa;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .footer-row a:hover {
+            color: #c4b5fd;
+        }
+
+        .footer-row #version {
+            margin-bottom: 6px;
+            color: #64748b;
+            font-size: 0.78rem;
+        }
+
+        /* L2 redirect pill — bottom-left */
+        .l2-redirect {
+            position: absolute;
+            left: 24px;
+            bottom: 32px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.13);
+            border-radius: 999px;
+            padding: 6px 14px 6px 10px;
+            font-size: 0.8rem;
+            color: #94a3b8;
+            cursor: default;
+            user-select: none;
+        }
+
+        .l2-redirect-box {
+            background: linear-gradient(135deg, #38bdf8, #a78bfa);
+            color: white;
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 6px;
+            letter-spacing: 0.04em;
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 600px) {
+            .header-row h1 {
+                font-size: 1.9rem;
+            }
+
+            .action-card {
+                padding: 24px;
+            }
+        }
+    </style>
 </head>
 
-<!-- body is set up as three rows: auto 1fr auto -->
 <body>
-    <!-- Row 1 -->
-    <div class="p-2">
-        <h1 class="text-center">SJB-umtx2 PS5 (1.xx-5.xx)</h1>
-        <p class="text-center" id="top-bar-text">Firmware Version: <span class="fw-bold" id="current-fw"></span></p>
 
-        <!-- This is absolute positioned to the body-->
+    <!-- Row 1 -->
+    <div class="header-row">
+        <h1>SJB-UMTX2 PS5</h1>
+        <p>Firmware Version: <span id="current-fw"></span></p>
         <div id="toast-container"></div>
     </div>
 
     <!-- Row 2 -->
     <div id="main-content">
-        <div id="pre-jb-view" class="d-flex align-items-center justify-content-center flex-direction-column selected">
-            <a tabindex="0" class="btn fw-bold" id="run-jb" onclick="run()">Jailbreak</a>
-            <a tabindex="0" class="btn" style="padding: 0.5rem 2rem; font-size: 1rem;" id="run-wk-only"
-                onclick="run(true)">Payload Injector (Must Be Jailbroken)</a>
+
+        <div id="pre-jb-view" class="selected">
+
+            <a tabindex="0" class="action-card" id="run-jb" onclick="run()">
+                <h2>💾 Jailbreak</h2>
+                <p>SJB-UMTX2 exploit chain for PS5 firmware 1.xx – 5.xx</p>
+                <span class="badge" id="jb-status-badge">Not Jailbroken</span>
+            </a>
+
+            <a tabindex="0" class="action-card" id="run-wk-only" onclick="run(true)">
+                <h2>📦 Payload Injector</h2>
+                <p>Inject a payload directly — device must already be jailbroken.</p>
+                <span class="badge waiting" id="inject-status-badge">Waiting for Jailbreak</span>
+            </a>
+
         </div>
 
         <div id="console-view">
             <div id="console" class="log"></div>
         </div>
 
-        <div id="payloads-view">
-        </div>
+        <div id="payloads-view"></div>
+
     </div>
 
     <!-- Row 3 -->
-    <div class="position-relative text-center p-2 mb-2">
-        <p class="text-secondary" id="version">v1.0</p>
-        <p class="text-secondary">Credit</p>
-        <h3 class="text-secondary mt-2">
-            <a href="https://github.com/StaticM223">StaticM223/StaticMdz</a>,
+    <div class="footer-row">
+        <p id="version">v1.0</p>
+        <p>Credit</p>
+        <h3 style="margin-top: 8px; font-size: 1rem;">
+            <a href="https://github.com/StaticM223">StaticM223 / StaticMdz</a>
         </h3>
 
-        <div class="position-absolute d-flex align-items-center bottom-0 left-0 m-4">
+        <div class="l2-redirect">
             <div class="l2-redirect-box">L2</div>
-            <span class="ml-2">Redirect</span>
+            <span>Redirect</span>
         </div>
     </div>
 
+    <!-- Original scripts — untouched -->
     <script src="int64.js"></script>
     <script src="rop.js"></script>
     <script src="main.js"></script>
@@ -60,8 +338,6 @@
     <script>
         addEventListener('unhandledrejection', (event) => {
             const reason = event.reason;
-            // We log the line and column numbers as well since some exceptions (like
-            // SyntaxError) do not show it in the stack trace.
             alert(
                 `${reason}\n`
                 + `${reason.sourceURL}:${reason.line}:${reason.column}\n`
@@ -69,9 +345,50 @@
             );
             throw reason;
         });
+
+        // ── Jailbreak status badge ──────────────────────────────────────
+        // Called by any existing script that has a success callback,
+        // OR triggered automatically by the MutationObserver below.
+        function markJailbroken() {
+            const jbBadge = document.getElementById("jb-status-badge");
+            if (jbBadge && jbBadge.textContent !== "Jailbroken") {
+                jbBadge.textContent = "Jailbroken";
+                jbBadge.className = "badge jailbroken";
+            }
+
+            const injectBadge = document.getElementById("inject-status-badge");
+            if (injectBadge && injectBadge.textContent !== "Ready to Inject") {
+                injectBadge.textContent = "Ready to Inject";
+                injectBadge.className = "badge ready-inject";
+            }
+        }
+
+        // Watch #console output for success keywords emitted by the exploit
+        const _jbObserver = new MutationObserver(() => {
+            const text = (document.getElementById("console")?.textContent || "").toLowerCase();
+            if (
+                text.includes("jailbroken") ||
+                text.includes("done!") ||
+                text.includes("success") ||
+                text.includes("escape done") ||
+                text.includes("kernel r/w") ||
+                text.includes("got kernel")
+            ) {
+                markJailbroken();
+            }
+        });
+
+        _jbObserver.observe(document.getElementById("console"), {
+            childList: true,
+            subtree: true,
+            characterData: true
+        });
+        // ────────────────────────────────────────────────────────────────
+
         document.getElementById("current-fw").innerHTML = fw_str;
         registerAppCacheEventHandlers();
         registerL2ButtonHandler();
+
         window.onload = function () {
             let autoload = sessionStorage.getItem(SESSIONSTORE_ON_LOAD_AUTORUN_KEY);
             if (autoload) {
@@ -79,6 +396,6 @@
             }
         };
     </script>
-</body>
 
+</body>
 </html>
