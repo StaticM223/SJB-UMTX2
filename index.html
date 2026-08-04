@@ -63,28 +63,35 @@
             gap: 10px;
         }
 
-        /* ── Row 2: Main content ── */
+        /* ── Row 2: Main content ──
+           Uses a stacking approach: all views sit in the same grid cell
+           so toggling .selected just changes visibility without
+           disrupting the flex/grid layout of siblings.            */
         #main-content {
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: grid;
+            grid-template-columns: 1fr;
+            align-items: start;
+            justify-items: center;
             padding: 20px 24px 40px;
         }
 
-        /* Pre-jailbreak view: two action cards */
-        #pre-jb-view {
-            display: none;
-            flex-direction: column;
-            gap: 20px;
+        /* Every view occupies the same grid cell and is hidden by default */
+        #pre-jb-view,
+        #console-view,
+        #payloads-view {
+            grid-column: 1;
+            grid-row: 1;
             width: 100%;
             max-width: 680px;
+            display: none;
         }
 
-        #pre-jb-view.selected {
-            display: flex;
-        }
+        /* .selected makes the view visible */
+        #pre-jb-view.selected  { display: flex; flex-direction: column; gap: 40px; }
+        #console-view.selected { display: block; }
+        #payloads-view.selected{ display: block; }
 
-        /* Card style matching page 2 */
+        /* ── Action cards ── */
         .action-card {
             position: relative;
             background: rgba(255, 255, 255, 0.08);
@@ -117,19 +124,18 @@
             transition: transform 0.5s ease;
         }
 
-        .action-card:hover::before {
-            transform: translateX(100%);
-        }
+        .action-card:hover::before { transform: translateX(100%); }
 
         .action-card:hover {
-            transform: translateY(-6px);
+            transform: translateY(-5px);
             border-color: rgba(56, 189, 248, 0.7);
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
         }
 
         .action-card h2 {
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             margin-bottom: 8px;
+            font-weight: 700;
         }
 
         .action-card p {
@@ -139,6 +145,7 @@
             margin-bottom: 20px;
         }
 
+        /* ── Badges ── */
         .badge {
             display: inline-block;
             padding: 5px 14px;
@@ -166,21 +173,9 @@
             color: white;
         }
 
-        .badge.secondary {
-            background: rgba(56, 189, 248, 0.2);
-            color: #38bdf8;
-            border: 1px solid rgba(56, 189, 248, 0.35);
-        }
-
-        /* ── Console view ── */
+        /* ── Console ── */
         #console-view {
-            display: none;
-            width: 100%;
             max-width: 760px;
-        }
-
-        #console-view.selected {
-            display: block;
         }
 
         #console {
@@ -188,7 +183,7 @@
             border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: 16px;
             padding: 20px;
-            font-family: "Fira Code", "Courier New", monospace;
+            font-family: "Courier New", Courier, monospace;
             font-size: 0.82rem;
             line-height: 1.6;
             color: #94a3b8;
@@ -200,13 +195,7 @@
 
         /* ── Payloads view ── */
         #payloads-view {
-            display: none;
-            width: 100%;
             max-width: 760px;
-        }
-
-        #payloads-view.selected {
-            display: block;
         }
 
         /* ── Row 3: Footer ── */
@@ -221,12 +210,9 @@
         .footer-row a {
             color: #a78bfa;
             text-decoration: none;
-            transition: color 0.2s;
         }
 
-        .footer-row a:hover {
-            color: #c4b5fd;
-        }
+        .footer-row a:hover { color: #c4b5fd; }
 
         .footer-row #version {
             margin-bottom: 6px;
@@ -234,7 +220,7 @@
             font-size: 0.78rem;
         }
 
-        /* L2 redirect pill — bottom-left */
+        /* L2 redirect pill */
         .l2-redirect {
             position: absolute;
             left: 24px;
@@ -262,15 +248,9 @@
             letter-spacing: 0.04em;
         }
 
-        /* ── Responsive ── */
         @media (max-width: 600px) {
-            .header-row h1 {
-                font-size: 1.9rem;
-            }
-
-            .action-card {
-                padding: 24px;
-            }
+            .header-row h1 { font-size: 1.9rem; }
+            .action-card   { padding: 24px; }
         }
     </style>
 </head>
@@ -290,14 +270,14 @@
         <div id="pre-jb-view" class="selected">
 
             <a tabindex="0" class="action-card" id="run-jb" onclick="run()">
-                <h2>💾 Jailbreak</h2>
-                <p>SJB-UMTX2 exploit chain for PS5 firmware 1.xx – 5.xx</p>
+                <h2>[JB] Jailbreak</h2>
+                <p>SJB-UMTX2 exploit chain for PS5 firmware 1.xx - 5.xx</p>
                 <span class="badge" id="jb-status-badge">Not Jailbroken</span>
             </a>
 
             <a tabindex="0" class="action-card" id="run-wk-only" onclick="run(true)">
-                <h2>📦 Payload Injector</h2>
-                <p>Inject a payload directly — device must already be jailbroken.</p>
+                <h2>[INJ] Payload Injector</h2>
+                <p>Inject a payload directly - device must already be jailbroken.</p>
                 <span class="badge waiting" id="inject-status-badge">Waiting for Jailbreak</span>
             </a>
 
@@ -321,11 +301,11 @@
 
         <div class="l2-redirect">
             <div class="l2-redirect-box">L2</div>
-            <span> Redirect</span>
+            <span>Redirect</span>
         </div>
     </div>
 
-    <!-- Original scripts — untouched -->
+    <!-- Original scripts - untouched -->
     <script src="int64.js"></script>
     <script src="rop.js"></script>
     <script src="main.js"></script>
@@ -336,49 +316,48 @@
     <script src="payload_map.js"></script>
 
     <script>
-        addEventListener('unhandledrejection', (event) => {
-            const reason = event.reason;
+        addEventListener('unhandledrejection', function(event) {
+            var reason = event.reason;
             alert(
-                `${reason}\n`
-                + `${reason.sourceURL}:${reason.line}:${reason.column}\n`
-                + `${reason.stack}`
+                reason + "\n"
+                + reason.sourceURL + ":" + reason.line + ":" + reason.column + "\n"
+                + reason.stack
             );
             throw reason;
         });
 
-        // ── Jailbreak status badge ──────────────────────────────────────
-        // Called by any existing script that has a success callback,
-        // OR triggered automatically by the MutationObserver below.
+        // ── Jailbreak status badges ─────────────────────────────────────
         function markJailbroken() {
-            const jbBadge = document.getElementById("jb-status-badge");
+            var jbBadge = document.getElementById("jb-status-badge");
             if (jbBadge && jbBadge.textContent !== "Jailbroken") {
                 jbBadge.textContent = "Jailbroken";
                 jbBadge.className = "badge jailbroken";
             }
 
-            const injectBadge = document.getElementById("inject-status-badge");
+            var injectBadge = document.getElementById("inject-status-badge");
             if (injectBadge && injectBadge.textContent !== "Ready to Inject") {
                 injectBadge.textContent = "Ready to Inject";
                 injectBadge.className = "badge ready-inject";
             }
         }
 
-        // Watch #console output for success keywords emitted by the exploit
-        const _jbObserver = new MutationObserver(() => {
-            const text = (document.getElementById("console")?.textContent || "").toLowerCase();
+        // Watch #console output for success keywords
+        var _consoleEl = document.getElementById("console");
+        var _jbObserver = new MutationObserver(function() {
+            var text = (_consoleEl.textContent || "").toLowerCase();
             if (
-                text.includes("jailbroken") ||
-                text.includes("done!") ||
-                text.includes("success") ||
-                text.includes("escape done") ||
-                text.includes("kernel r/w") ||
-                text.includes("got kernel")
+                text.indexOf("jailbroken")  !== -1 ||
+                text.indexOf("done!")       !== -1 ||
+                text.indexOf("success")     !== -1 ||
+                text.indexOf("escape done") !== -1 ||
+                text.indexOf("kernel r/w")  !== -1 ||
+                text.indexOf("got kernel")  !== -1
             ) {
                 markJailbroken();
             }
         });
 
-        _jbObserver.observe(document.getElementById("console"), {
+        _jbObserver.observe(_consoleEl, {
             childList: true,
             subtree: true,
             characterData: true
@@ -389,8 +368,8 @@
         registerAppCacheEventHandlers();
         registerL2ButtonHandler();
 
-        window.onload = function () {
-            let autoload = sessionStorage.getItem(SESSIONSTORE_ON_LOAD_AUTORUN_KEY);
+        window.onload = function() {
+            var autoload = sessionStorage.getItem(SESSIONSTORE_ON_LOAD_AUTORUN_KEY);
             if (autoload) {
                 run(autoload == "wkonly", false);
             }
