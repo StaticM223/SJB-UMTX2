@@ -45,7 +45,7 @@
  */
 
 if (!navigator.userAgent.includes('PlayStation 5')) {
-    alert(`This is a PlayStation 5 Exploit. => ${navigator.userAgent}`);
+    alert(`Umm this is a PS5 Exploit, are you retarded?. 》Browser Info《 ${navigator.userAgent}`);
     throw new Error("");
 }
 
