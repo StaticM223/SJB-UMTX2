@@ -40,13 +40,13 @@
         /* ── Buttons ──
            Restyled as dark cards. max-width + auto margins centre them
            inside whatever flex layout main.css provides.
-           margin-bottom on #run-jb creates the gap (gap: property
-           is unreliable on PS5 WebKit).
         ── */
         .btn {
             display: block;
             width: 100%;
             max-width: 520px;
+            height: auto !important;
+            min-height: auto !important;
             margin-left:  auto;
             margin-right: auto;
             background: #0f172a;
@@ -54,12 +54,13 @@
             border-radius: 16px;
             padding: 26px 32px !important;
             font-size: 1.1rem !important;
+            font-weight: 700;
             color: white;
             text-decoration: none;
             cursor: pointer;
             text-align: left;
             position: relative;
-            overflow: hidden;
+            overflow: visible !important;
             -webkit-transition: border-color .25s, -webkit-transform .25s, box-shadow .25s;
                     transition: border-color .25s,         transform .25s, box-shadow .25s;
         }
@@ -76,12 +77,14 @@
             content: "";
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
+            border-radius: 16px;
             background: -webkit-linear-gradient(left, transparent, rgba(255,255,255,.08), transparent);
             background:          linear-gradient(90deg, transparent, rgba(255,255,255,.08), transparent);
             -webkit-transform: translateX(-100%);
                     transform: translateX(-100%);
             -webkit-transition: -webkit-transform .5s;
                     transition:         transform .5s;
+            pointer-events: none;
         }
         .btn:hover::before {
             -webkit-transform: translateX(100%);
@@ -91,13 +94,13 @@
         /* Gap between the two buttons */
         #run-jb {
             margin-bottom: 28px;
-            font-size: 1.25rem !important;
-            font-weight: 700;
         }
 
         /* Badge spans appended by JS below */
         .sjb-badge {
-            display: inline-block;
+            display: block;
+            width: -webkit-fit-content;
+            width: fit-content;
             margin-top: 14px;
             padding: 4px 12px;
             border-radius: 999px;
@@ -123,7 +126,7 @@
             color: white;
         }
 
-        /* Console */
+        /* Console & Payload View Fixes */
         #console {
             background: #020617;
             border: 1px solid rgba(255, 255, 255, .12);
@@ -138,6 +141,20 @@
             overflow-y: auto;
         }
         #console * { color: inherit; }
+
+        #payloads-view {
+            overflow: visible;
+        }
+        #payloads-view .btn,
+        #payloads-view button,
+        #payloads-view a {
+            height: auto !important;
+            min-height: auto !important;
+            max-height: none !important;
+            line-height: normal !important;
+            overflow: visible !important;
+            white-space: normal !important;
+        }
 
         /* Footer */
         .text-secondary       { color: #475569 !important; }
@@ -173,8 +190,7 @@
     <div id="main-content">
         <div id="pre-jb-view" class="d-flex align-items-center justify-content-center flex-direction-column selected">
             <a tabindex="0" class="btn fw-bold" id="run-jb" onclick="run()">Jailbreak</a>
-            <a tabindex="0" class="btn" style="padding: 0.5rem 2rem; font-size: 1rem;" id="run-wk-only"
-                onclick="run(true)">Payload Injector (Must Be Jailbroken)</a>
+            <a tabindex="0" class="btn fw-bold" id="run-wk-only" onclick="run(true)">Payload Injector (Must Be Jailbroken)</a>
         </div>
 
         <div id="console-view">
