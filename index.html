@@ -64,61 +64,56 @@
             z-index: 9999;
         }
 
-        /* ── Main content: simple flex centering ──
-           All views default to display:none.
-           main.js adds/removes .selected to switch between them.
-           The flex container just centers whatever is visible.
+        /* ── Main content ──
+           !important overrides whatever main.css sets on these IDs.
         ── */
         #main-content {
-            display: -webkit-flex;
-            display: flex;
-            -webkit-align-items: center;
-                    align-items: center;
-            -webkit-justify-content: center;
-                    justify-content: center;
-            padding: 20px 24px 40px;
+            display: -webkit-flex !important;
+            display: flex !important;
+            -webkit-align-items: center !important;
+                    align-items: center !important;
+            -webkit-justify-content: center !important;
+                    justify-content: center !important;
+            padding: 20px 24px 40px !important;
         }
 
-        /* All three views hidden by default */
         #pre-jb-view,
         #console-view,
         #payloads-view {
-            display: none;
-            width: 100%;
-            max-width: 680px;
+            display: none !important;
+            width: 100% !important;
+            max-width: 680px !important;
+            text-align: left !important;
         }
 
-        /* .selected reveals each view */
         #pre-jb-view.selected {
-            display: -webkit-flex;
-            display: flex;
-            -webkit-flex-direction: column;
-                    flex-direction: column;
+            display: -webkit-flex !important;
+            display: flex !important;
+            -webkit-flex-direction: column !important;
+                    flex-direction: column !important;
         }
 
-        /* Gap between the two cards using margin — gap property
-           is not reliably supported on PS5's WebKit */
+        /* Gap — margin instead of gap for PS5 WebKit */
         #run-jb {
             margin-bottom: 40px;
         }
 
         #console-view.selected {
-            display: block;
-            max-width: 760px;
+            display: block !important;
+            max-width: 760px !important;
         }
 
         #payloads-view.selected {
-            display: block;
+            display: block !important;
+            max-width: 760px !important;
         }
 
         /* ── Cards ── */
         .action-card {
             position: relative;
-            background: rgba(255, 255, 255, 0.08);
-            /* backdrop-filter has patchy PS5 support — solid fallback */
+            /* No backdrop-filter — causes "no free system memory" on PS5 */
             background-color: #0f172a;
-            -webkit-backdrop-filter: blur(15px);
-                    backdrop-filter: blur(15px);
+            background: #0f172a;
             border: 1px solid rgba(255, 255, 255, 0.15);
             border-radius: 20px;
             padding: 30px 36px;
@@ -231,7 +226,6 @@
         /* ── Console ── */
         #console {
             background: #020617;
-            background: rgba(2, 6, 23, 0.92);
             border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: 16px;
             padding: 20px;
@@ -394,7 +388,7 @@
             var text = _con.textContent ? _con.textContent.toLowerCase() : '';
             if (
                 text.indexOf('jailbroken')  !== -1 ||
-                text.indexOf('done!')       !== -1 ||
+                text.indexOf('done')        !== -1 ||
                 text.indexOf('success')     !== -1 ||
                 text.indexOf('escape done') !== -1 ||
                 text.indexOf('kernel r/w')  !== -1 ||
