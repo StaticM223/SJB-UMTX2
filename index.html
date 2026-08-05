@@ -1,353 +1,204 @@
-<!DOCTYPE html>
-<html lang="en">
+<html>
+<!-- <html manifest="cache.appcache"> -->
 
 <head>
-    <title>SJB-UMTX2 PS5</title>
-    <meta charset="UTF-8">
+    <title>Shit Jailbreak</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <!-- Keep original CSS so main.js view-switching still works -->
     <link rel="stylesheet" href="main.css">
 
+    <!-- VISUAL ONLY — nothing structural, no ID/class/script changes -->
     <style>
-        /* ── Reset ── */
-        * { box-sizing: border-box; margin: 0; padding: 0; }
 
-        /* ── Background ── */
+        /* Background */
         body {
-            min-height: 100vh;
-            display: grid;
-            grid-template-rows: auto 1fr auto;
             background: #020617;
             background-image:
                 -webkit-radial-gradient(top left circle, #1e3a8a, transparent 40%),
                 -webkit-radial-gradient(bottom right circle, #7c3aed, transparent 40%);
             background-image:
-                radial-gradient(circle at top left, #1e3a8a, transparent 40%),
+                radial-gradient(circle at top left,     #1e3a8a, transparent 40%),
                 radial-gradient(circle at bottom right, #7c3aed, transparent 40%);
             color: white;
             font-family: Inter, "Segoe UI", Arial, sans-serif;
         }
 
-        /* ── Header ── */
-        .header-row {
-            text-align: center;
-            padding: 48px 24px 24px;
-            position: relative;
-        }
-
-        .header-row h1 {
-            font-size: 2.6rem;
+        /* Header */
+        h1 {
+            font-size: 2rem;
             font-weight: 700;
-            /* Gradient text — webkit prefix for PS5 */
             background: -webkit-linear-gradient(left, #38bdf8, #a78bfa);
             background:          linear-gradient(90deg, #38bdf8, #a78bfa);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            color: #38bdf8; /* plain fallback if clip not supported */
-            letter-spacing: -0.5px;
+            color: #38bdf8; /* plain fallback */
+            margin-bottom: 6px;
         }
 
-        .header-row p {
-            color: #cbd5e1;
-            font-size: 1rem;
-            margin-top: 10px;
-        }
+        #top-bar-text { color: #cbd5e1; }
+        #current-fw   { color: #38bdf8; }
 
-        #current-fw { color: #38bdf8; }
-
-        /* ── Toast ── */
-        #toast-container {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 9999;
-        }
-
-        /* ── Main content ──
-           !important overrides whatever main.css sets on these IDs.
+        /* ── Buttons ──
+           Restyled as dark cards. max-width + auto margins centre them
+           inside whatever flex layout main.css provides.
+           margin-bottom on #run-jb creates the gap (gap: property
+           is unreliable on PS5 WebKit).
         ── */
-        #main-content {
-            display: -webkit-flex !important;
-            display: flex !important;
-            -webkit-align-items: center !important;
-                    align-items: center !important;
-            -webkit-justify-content: center !important;
-                    justify-content: center !important;
-            padding: 20px 24px 40px !important;
-        }
-
-        #pre-jb-view,
-        #console-view,
-        #payloads-view {
-            display: none !important;
-            width: 100% !important;
-            max-width: 680px !important;
-            text-align: left !important;
-        }
-
-        #pre-jb-view.selected {
-            display: -webkit-flex !important;
-            display: flex !important;
-            -webkit-flex-direction: column !important;
-                    flex-direction: column !important;
-        }
-
-        /* Gap — margin instead of gap for PS5 WebKit */
-        #run-jb {
-            margin-bottom: 40px;
-        }
-
-        #console-view.selected {
-            display: block !important;
-            max-width: 760px !important;
-        }
-
-        #payloads-view.selected {
-            display: block !important;
-            max-width: 760px !important;
-        }
-
-        /* ── Cards ── */
-        .action-card {
-            position: relative;
-            /* No backdrop-filter — causes "no free system memory" on PS5 */
-            background-color: #0f172a;
+        .btn {
+            display: block;
+            width: 100%;
+            max-width: 520px;
+            margin-left:  auto;
+            margin-right: auto;
             background: #0f172a;
             border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 20px;
-            padding: 30px 36px;
+            border-radius: 16px;
+            padding: 26px 32px !important;
+            font-size: 1.1rem !important;
             color: white;
             text-decoration: none;
-            overflow: hidden;
             cursor: pointer;
-            display: block;
-            -webkit-transition:
-                -webkit-transform 0.25s ease,
-                border-color 0.25s ease,
-                box-shadow 0.25s ease;
-            transition:
-                transform 0.25s ease,
-                border-color 0.25s ease,
-                box-shadow 0.25s ease;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+            -webkit-transition: border-color .25s, -webkit-transform .25s, box-shadow .25s;
+                    transition: border-color .25s,         transform .25s, box-shadow .25s;
         }
 
-        .action-card:hover {
-            -webkit-transform: translateY(-5px);
-                    transform: translateY(-5px);
-            border-color: rgba(56, 189, 248, 0.7);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        .btn:hover {
+            border-color: rgba(56, 189, 248, .7);
+            -webkit-transform: translateY(-4px);
+                    transform: translateY(-4px);
+            box-shadow: 0 16px 32px rgba(0, 0, 0, .45);
         }
 
-        /* Shimmer sweep */
-        .action-card::before {
+        /* Shimmer on hover — no GPU blur needed */
+        .btn::before {
             content: "";
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: -webkit-linear-gradient(left, transparent, rgba(255,255,255,0.12), transparent);
-            background:          linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent);
+            background: -webkit-linear-gradient(left, transparent, rgba(255,255,255,.08), transparent);
+            background:          linear-gradient(90deg, transparent, rgba(255,255,255,.08), transparent);
             -webkit-transform: translateX(-100%);
                     transform: translateX(-100%);
-            -webkit-transition: -webkit-transform 0.5s ease;
-                    transition: transform 0.5s ease;
+            -webkit-transition: -webkit-transform .5s;
+                    transition:         transform .5s;
         }
-
-        .action-card:hover::before {
+        .btn:hover::before {
             -webkit-transform: translateX(100%);
                     transform: translateX(100%);
         }
 
-        /* Card icon — CSS only, no emoji */
-        .card-icon {
-            display: inline-block;
-            width: 40px;
-            height: 40px;
-            line-height: 40px;
-            text-align: center;
-            border-radius: 10px;
-            margin-bottom: 14px;
-            font-size: 0.85rem;
-            font-weight: 900;
-            background: rgba(56, 189, 248, 0.15);
-            border: 1px solid rgba(56, 189, 248, 0.3);
-            color: #38bdf8;
-        }
-
-        .card-icon.purple {
-            background: rgba(167, 139, 250, 0.15);
-            border-color: rgba(167, 139, 250, 0.3);
-            color: #a78bfa;
-        }
-
-        .action-card h2 {
-            font-size: 1.4rem;
+        /* Gap between the two buttons */
+        #run-jb {
+            margin-bottom: 28px;
+            font-size: 1.25rem !important;
             font-weight: 700;
-            margin-bottom: 8px;
         }
 
-        .action-card p {
-            color: #cbd5e1;
-            font-size: 0.95rem;
-            line-height: 1.5;
-            margin-bottom: 20px;
-        }
-
-        /* ── Badges ── */
-        .badge {
+        /* Badge spans appended by JS below */
+        .sjb-badge {
             display: inline-block;
-            padding: 5px 14px;
+            margin-top: 14px;
+            padding: 4px 12px;
             border-radius: 999px;
-            font-size: 0.78rem;
+            font-size: .75rem;
             font-weight: 600;
-            background: #22c55e;
-            color: white;
         }
-
-        .badge.jailbroken {
+        .sjb-badge.not-jb {
+            background: rgba(255,255,255,.08);
+            border: 1px solid rgba(255,255,255,.2);
+            color: #94a3b8;
+        }
+        .sjb-badge.jailbroken {
             background: #38bdf8;
-            /* gradient fallback for older WebKit */
-            background: -webkit-linear-gradient(left, #38bdf8, #a78bfa);
-            background:          linear-gradient(90deg, #38bdf8, #a78bfa);
-            color: white;
-            box-shadow: 0 0 12px rgba(56, 189, 248, 0.45);
+            color: #020617;
         }
-
-        .badge.waiting {
-            background: rgba(251, 191, 36, 0.15);
+        .sjb-badge.waiting {
+            background: rgba(251, 191, 36, .12);
+            border: 1px solid rgba(251, 191, 36, .35);
             color: #fbbf24;
-            border: 1px solid rgba(251, 191, 36, 0.35);
         }
-
-        .badge.ready-inject {
+        .sjb-badge.ready {
             background: #22c55e;
             color: white;
         }
 
-        /* ── Console ── */
+        /* Console */
         #console {
             background: #020617;
-            border: 1px solid rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, .12);
             border-radius: 16px;
             padding: 20px;
             font-family: "Courier New", Courier, monospace;
-            font-size: 0.82rem;
+            font-size: .82rem;
             line-height: 1.6;
             color: #94a3b8;
             min-height: 280px;
             max-height: 50vh;
             overflow-y: auto;
-            word-break: break-all;
         }
-
-        /* Make sure anything main.js appends inside #console is visible */
         #console * { color: inherit; }
 
-        /* ── Footer ── */
-        .footer-row {
-            text-align: center;
-            padding: 20px 24px 32px;
-            position: relative;
-            color: #94a3b8;
-            font-size: 0.85rem;
-        }
+        /* Footer */
+        .text-secondary       { color: #475569 !important; }
+        .text-secondary a     { color: #a78bfa; text-decoration: none; }
+        .text-secondary a:hover { color: #c4b5fd; }
 
-        .footer-row a {
-            color: #a78bfa;
-            text-decoration: none;
-        }
-
-        #version {
-            margin-bottom: 6px;
-            color: #64748b;
-            font-size: 0.78rem;
-        }
-
-        .l2-redirect {
-            position: absolute;
-            left: 24px;
-            bottom: 32px;
-            display: -webkit-flex;
-            display: flex;
-            -webkit-align-items: center;
-                    align-items: center;
-            gap: 8px;
-            background: rgba(255, 255, 255, 0.07);
-            border: 1px solid rgba(255, 255, 255, 0.13);
-            border-radius: 999px;
-            padding: 6px 14px 6px 10px;
-            font-size: 0.8rem;
-            color: #94a3b8;
-        }
-
+        /* L2 pill */
         .l2-redirect-box {
-            background: #38bdf8;
+            background: -webkit-linear-gradient(left, #38bdf8, #a78bfa);
+            background:          linear-gradient(90deg, #38bdf8, #a78bfa);
             color: white;
-            font-size: 0.72rem;
             font-weight: 700;
-            padding: 3px 8px;
+            padding: 4px 10px;
             border-radius: 6px;
-            letter-spacing: 0.04em;
+            font-size: .8rem;
         }
 
-        @media (max-width: 600px) {
-            .header-row h1 { font-size: 1.9rem; }
-            .action-card { padding: 24px; }
-        }
     </style>
 </head>
 
+<!-- body is set up as three rows: auto 1fr auto -->
 <body>
-
     <!-- Row 1 -->
-    <div class="header-row">
-        <h1>SJB-UMTX2 PS5</h1>
-        <p>Firmware Version: <span id="current-fw"></span></p>
+    <div class="p-2">
+        <h1 class="text-center">SJB-umtx2 PS5 (1.xx-5.xx)</h1>
+        <p class="text-center" id="top-bar-text">Firmware Version: <span class="fw-bold" id="current-fw"></span></p>
+
+        <!-- This is absolute positioned to the body-->
         <div id="toast-container"></div>
     </div>
 
     <!-- Row 2 -->
     <div id="main-content">
-
-        <div id="pre-jb-view" class="selected">
-
-            <a tabindex="0" class="action-card" id="run-jb" onclick="run()">
-                <div class="card-icon">JB</div>
-                <h2>Jailbreak</h2>
-                <p>SJB-UMTX2 exploit chain for PS5 firmware 1.xx - 5.xx</p>
-                <span class="badge" id="jb-status-badge">Not Jailbroken</span>
-            </a>
-
-            <a tabindex="0" class="action-card" id="run-wk-only" onclick="run(true)">
-                <div class="card-icon purple">PL</div>
-                <h2>Payload Injector</h2>
-                <p>Inject a payload directly -- device must already be jailbroken.</p>
-                <span class="badge waiting" id="inject-status-badge">Waiting for Jailbreak</span>
-            </a>
-
+        <div id="pre-jb-view" class="d-flex align-items-center justify-content-center flex-direction-column selected">
+            <a tabindex="0" class="btn fw-bold" id="run-jb" onclick="run()">Jailbreak</a>
+            <a tabindex="0" class="btn" style="padding: 0.5rem 2rem; font-size: 1rem;" id="run-wk-only"
+                onclick="run(true)">Payload Injector (Must Be Jailbroken)</a>
         </div>
 
         <div id="console-view">
             <div id="console" class="log"></div>
         </div>
 
-        <div id="payloads-view"></div>
-
-    </div>
-
-    <!-- Row 3 -->
-    <div class="footer-row">
-        <p id="version">v1.0</p>
-        <p>Credit</p>
-        <h3 style="margin-top: 8px; font-size: 1rem;">
-            <a href="https://github.com/StaticM223">StaticM223 / StaticMdz</a>
-        </h3>
-        <div class="l2-redirect">
-            <div class="l2-redirect-box">L2</div>
-            <span>Redirect</span>
+        <div id="payloads-view">
         </div>
     </div>
 
-    <!-- Original scripts — untouched -->
+    <!-- Row 3 -->
+    <div class="position-relative text-center p-2 mb-2">
+        <p class="text-secondary" id="version">v1.0</p>
+        <p class="text-secondary">Credit</p>
+        <h3 class="text-secondary mt-2">
+            <a href="https://github.com/StaticM223">StaticM223/StaticMdz</a>,
+        </h3>
+
+        <div class="position-absolute d-flex align-items-center bottom-0 left-0 m-4">
+            <div class="l2-redirect-box">L2</div>
+            <span class="ml-2">Redirect</span>
+        </div>
+    </div>
+
     <script src="int64.js"></script>
     <script src="rop.js"></script>
     <script src="main.js"></script>
@@ -358,59 +209,61 @@
     <script src="payload_map.js"></script>
 
     <script>
-        addEventListener('unhandledrejection', function(event) {
-            var reason = event.reason;
+        addEventListener('unhandledrejection', (event) => {
+            const reason = event.reason;
+            // We log the line and column numbers as well since some exceptions (like
+            // SyntaxError) do not show it in the stack trace.
             alert(
-                reason + '\n'
-                + reason.sourceURL + ':' + reason.line + ':' + reason.column + '\n'
-                + reason.stack
+                `${reason}\n`
+                + `${reason.sourceURL}:${reason.line}:${reason.column}\n`
+                + `${reason.stack}`
             );
             throw reason;
         });
-
-        // ── Badge updater ─────────────────────────────────────────────
-        function markJailbroken() {
-            var jbBadge = document.getElementById('jb-status-badge');
-            if (jbBadge && jbBadge.textContent !== 'Jailbroken') {
-                jbBadge.textContent = 'Jailbroken';
-                jbBadge.className = 'badge jailbroken';
-            }
-            var injectBadge = document.getElementById('inject-status-badge');
-            if (injectBadge && injectBadge.textContent !== 'Ready to Inject') {
-                injectBadge.textContent = 'Ready to Inject';
-                injectBadge.className = 'badge ready-inject';
-            }
-        }
-
-        // Watch #console for exploit success keywords
-        var _con = document.getElementById('console');
-        var _obs = new MutationObserver(function() {
-            var text = _con.textContent ? _con.textContent.toLowerCase() : '';
-            if (
-                text.indexOf('jailbroken')  !== -1 ||
-                text.indexOf('done')        !== -1 ||
-                text.indexOf('success')     !== -1 ||
-                text.indexOf('escape done') !== -1 ||
-                text.indexOf('kernel r/w')  !== -1 ||
-                text.indexOf('got kernel')  !== -1
-            ) {
-                markJailbroken();
-            }
-        });
-        _obs.observe(_con, { childList: true, subtree: true, characterData: true });
-        // ─────────────────────────────────────────────────────────────
-
-        document.getElementById('current-fw').innerHTML = fw_str;
+        document.getElementById("current-fw").innerHTML = fw_str;
         registerAppCacheEventHandlers();
         registerL2ButtonHandler();
-
-        window.onload = function() {
-            var autoload = sessionStorage.getItem(SESSIONSTORE_ON_LOAD_AUTORUN_KEY);
+        window.onload = function () {
+            let autoload = sessionStorage.getItem(SESSIONSTORE_ON_LOAD_AUTORUN_KEY);
             if (autoload) {
-                run(autoload === 'wkonly', false);
+                run(autoload == "wkonly", false);
             }
         };
     </script>
 
+    <!-- Status badges + jailbreak detection — appended after originals, touches nothing above -->
+    <script>
+        // Append badge spans below each button
+        var jbBtn = document.getElementById('run-jb');
+        var jbBadge = document.createElement('span');
+        jbBadge.className = 'sjb-badge not-jb';
+        jbBadge.id = 'jb-status-badge';
+        jbBadge.textContent = 'Not Jailbroken';
+        jbBtn.appendChild(jbBadge);
+
+        var plBtn = document.getElementById('run-wk-only');
+        var plBadge = document.createElement('span');
+        plBadge.className = 'sjb-badge waiting';
+        plBadge.id = 'inject-status-badge';
+        plBadge.textContent = 'Waiting for Jailbreak';
+        plBtn.appendChild(plBadge);
+
+        function markJailbroken() {
+            var b1 = document.getElementById('jb-status-badge');
+            if (b1) { b1.textContent = 'Jailbroken'; b1.className = 'sjb-badge jailbroken'; }
+            var b2 = document.getElementById('inject-status-badge');
+            if (b2) { b2.textContent = 'Ready to Inject'; b2.className = 'sjb-badge ready'; }
+        }
+
+        // Watch #console for the "done" keyword
+        var _con = document.getElementById('console');
+        var _obs = new MutationObserver(function() {
+            var t = _con.textContent ? _con.textContent.toLowerCase() : '';
+            if (t.indexOf('done') !== -1) { markJailbroken(); }
+        });
+        _obs.observe(_con, { childList: true, subtree: true, characterData: true });
+    </script>
+
 </body>
+
 </html>
