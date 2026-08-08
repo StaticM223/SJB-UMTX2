@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
 <!-- <html manifest="cache.appcache"> -->
 
@@ -88,8 +89,8 @@
             box-shadow: 0 18px 36px -10px rgba(56, 189, 248, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.2);
         }
 
-        /* Spacing between primary buttons */
-        #run-jb {
+        /* Spacing between primary buttons in pre-jb view */
+        #pre-jb-view .btn:not(:last-child) {
             margin-bottom: 24px;
         }
 
@@ -195,8 +196,8 @@
     <div id="main-content">
         <div id="pre-jb-view" class="d-flex align-items-center justify-content-center flex-direction-column selected">
             <a tabindex="0" class="btn fw-bold" id="run-jb" onclick="run()">Jailbreak</a>
-            <a tabindex="0" class="btn fw-bold" id="run-wk-only" onclick="run(true)">Payload Injector (Must Be Jailbroken)</a>            
-            <a tabindex="0" class="btn fw-bold" id="run-wk-only" onclick="run(true)">Kill Lenouah</a>
+            <a tabindex="0" class="btn fw-bold" id="run-payload-injector" onclick="run(true)">Payload Injector (Must Be Jailbroken)</a>            
+            <a tabindex="0" class="btn fw-bold" id="run-kill-len" onclick="run(true)">Kill Lenouah</a>
         </div>
 
         <div id="console-view">
@@ -256,6 +257,3 @@
 </body>
 
 </html>
-
-
-
