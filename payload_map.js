@@ -51,6 +51,16 @@ const payload_map = [
         version: "1.6b16",
         toPort: 9021
     },
+		{
+        displayTitle: "Ghost control Xinput Test2",
+        description: "GC",
+        fileName: "ghost-control-xinput-rd2-comparison.elf",
+        author: "FardinHaque70",
+        projectSource: "https://github.com/FardinHaque70/Ghostcontrol-PS5-USB-Controller-Patcher",
+        binarySource: "https://github.com/FardinHaque70/Ghostcontrol-PS5-USB-Controller-Patcher/releases/download/v1.1.0/ghost-control-x10-ds4.elf",
+        version: "1.1.0",
+        toPort: 9021
+    },
 	{
         displayTitle: "Ghost control Xinput Test",
         description: "GC",
